@@ -35,8 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
-
 ### docker ###
 docker-compose.yml
 ### mysql ###
 mysql/
+### log ###
+*.log
+### env ###
+http-client.env.json
+### application.properties ###
+src/main/resources/application.properties
