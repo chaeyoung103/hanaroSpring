@@ -1,5 +1,8 @@
 package com.example.hanaro.domain.cart.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.example.hanaro.domain.product.entity.Product;
 import com.example.hanaro.domain.user.entity.User;
 import com.example.hanaro.global.entity.BaseEntity;
@@ -22,6 +25,7 @@ public class CartItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -37,7 +37,8 @@ public class Order extends BaseEntity {
     private Timestamp orderDate;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
