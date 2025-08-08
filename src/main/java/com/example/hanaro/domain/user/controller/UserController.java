@@ -2,7 +2,11 @@ package com.example.hanaro.domain.user.controller;
 
 import com.example.hanaro.domain.user.dto.request.UserSignInRequestDto;
 import com.example.hanaro.domain.user.dto.request.UserSignUpRequestDto;
+import com.example.hanaro.domain.user.dto.response.UserSignInResponseDto;
 import com.example.hanaro.domain.user.service.UserService;
+import com.example.hanaro.global.response.BaseResponse;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,15 +23,16 @@ public class UserController {
 
 	// 회원가입 API
 	@PostMapping("/signup")
-	public ResponseEntity<String> signUp(@RequestBody UserSignUpRequestDto requestDto) {
+	public ResponseEntity<BaseResponse<Void>> signUp(@Valid @RequestBody UserSignUpRequestDto requestDto) { // <-- @Valid 추가!
 		userService.signUp(requestDto);
-		return ResponseEntity.ok("회원가입 성공");
+		return ResponseEntity.ok(new BaseResponse<>());
 	}
 
 	// 로그인 API
 	@PostMapping("/signin")
-	public ResponseEntity<String> signIn(@RequestBody UserSignInRequestDto requestDto) {
-		String token = userService.signIn(requestDto);
-		return ResponseEntity.ok(token);
+	public ResponseEntity<BaseResponse<UserSignInResponseDto>> signIn(
+		@Valid @RequestBody UserSignInRequestDto requestDto) {
+		UserSignInResponseDto response = userService.signIn(requestDto);
+		return ResponseEntity.ok(new BaseResponse<>(response));
 	}
 }

@@ -2,6 +2,7 @@ package com.example.hanaro.domain.user.service;
 
 import com.example.hanaro.domain.user.dto.request.UserSignInRequestDto;
 import com.example.hanaro.domain.user.dto.request.UserSignUpRequestDto;
+import com.example.hanaro.domain.user.dto.response.UserSignInResponseDto;
 
 public interface UserService {
 
@@ -16,5 +17,5 @@ public interface UserService {
 	 * @param requestDto 로그인 요청 정보
 	 * @return JWT 토큰
 	 */
-	String signIn(UserSignInRequestDto requestDto);
+	UserSignInResponseDto signIn(UserSignInRequestDto requestDto);
 }
