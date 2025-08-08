@@ -2,6 +2,7 @@ package com.example.hanaro.domain.cart.entity;
 
 import com.example.hanaro.domain.product.entity.Product;
 import com.example.hanaro.domain.user.entity.User;
+import com.example.hanaro.global.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,11 +10,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "cart_items")
 @Getter
 @Setter
 @NoArgsConstructor
-public class CartItem {
+public class CartItem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +21,19 @@ public class CartItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user", nullable = false)
-    private User user;
+    @JoinColumn(name = "cart", nullable = false)
+    private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product", nullable = false)
     private Product product;
 
     @Column(nullable = false)
     private Integer quantity;
+
+    public CartItem(Cart cart, Product product, int quantity) {
+        this.cart = cart;
+        this.product = product;
+        this.quantity = quantity;
+    }
 }

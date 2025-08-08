@@ -8,12 +8,13 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.sql.Date;
 
+import com.example.hanaro.global.entity.BaseEntity;
+
 @Entity
-@Table(name = "daily_sales_stats")
 @Getter
 @Setter
 @NoArgsConstructor
-public class DailySalesStats {
+public class DailySalesStats extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

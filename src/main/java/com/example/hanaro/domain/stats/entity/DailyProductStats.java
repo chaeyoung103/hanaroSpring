@@ -9,13 +9,13 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 import com.example.hanaro.domain.product.entity.Product;
+import com.example.hanaro.global.entity.BaseEntity;
 
 @Entity
-@Table(name = "daily_product_stats")
 @Getter
 @Setter
 @NoArgsConstructor
-public class DailyProductStats {
+public class DailyProductStats extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import com.example.hanaro.global.entity.BaseEntity;
 
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor

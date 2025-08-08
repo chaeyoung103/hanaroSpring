@@ -8,12 +8,13 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import com.example.hanaro.global.entity.BaseEntity;
+
 @Entity
-@Table(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Product {
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,12 +33,6 @@ public class Product {
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
 
-    @Column(name = "image_url")
-    private String imageUrl;
-
-    @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createdAt;
-
-    @Column(name = "updated_at", nullable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Timestamp updatedAt;
+    @Column(name = "image")
+    private String image;
 }
