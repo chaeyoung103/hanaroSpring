@@ -26,4 +26,12 @@ public class BaseResponse<T> implements ErrorCode {
 		this.message = SUCCESS.getMessage();
 		this.result = result;
 	}
+
+	@JsonCreator
+	public BaseResponse() {
+		this.status = SUCCESS.getStatus();
+		this.code = SUCCESS.getCode();
+		this.message = SUCCESS.getMessage();
+		this.result = null;
+	}
 }
