@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 public class HanaroApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(HanaroApplication.class, args);
 	}
