@@ -11,6 +11,7 @@ import com.example.hanaro.domain.product.entity.Product;
 import com.example.hanaro.global.entity.BaseEntity;
 
 @Entity
+@Table(name = "`OrderItem`")
 @Getter
 @Setter
 @NoArgsConstructor
