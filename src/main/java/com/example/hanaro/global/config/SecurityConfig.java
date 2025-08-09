@@ -3,7 +3,7 @@ package com.example.hanaro.global.config;
 import com.example.hanaro.global.jwt.JwtAuthenticationFilter;
 import com.example.hanaro.global.jwt.JwtUtil;
 import com.example.hanaro.global.jwt.handler.CustomAccessDeniedHandler;
-
+import com.example.hanaro.global.jwt.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,8 @@ import java.util.Arrays;
 public class SecurityConfig {
 
 	private final JwtUtil jwtUtil;
-	private final CustomAccessDeniedHandler customAccessDeniedHandler; // 1. 외부 핸들러 주입
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -53,13 +54,14 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/users/signup", "/users/signin", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+				.requestMatchers( "users/signup","/users/signin", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
 			.exceptionHandling(exceptions -> exceptions
 				.accessDeniedHandler(customAccessDeniedHandler)
+				.authenticationEntryPoint(customAuthenticationEntryPoint)
 			);
 
 		return http.build();

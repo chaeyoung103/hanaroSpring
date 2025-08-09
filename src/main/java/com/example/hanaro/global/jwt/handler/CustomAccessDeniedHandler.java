@@ -25,14 +25,10 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 		throws IOException, ServletException {
 		log.warn("Access Denied: {}", accessDeniedException.getMessage());
 
-		// 1. BaseErrorResponse 생성
 		BaseErrorResponse errorResponse = new BaseErrorResponse(ACCESS_DENIED);
 
-		// 2. HTTP 응답 설정
 		response.setStatus(ACCESS_DENIED.getStatus());
 		response.setContentType("application/json;charset=UTF-8");
-
-		// 3. JSON으로 변환하여 응답 본문에 쓰기
 		response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 	}
 }
