@@ -19,17 +19,21 @@ Content-Type: application/json
   "password": "password1234"
 }
 
+### 3. 토큰 재발급 (Reissue Token)
+# POST 요청의 Body에 Refresh Token을 담아 보냅니다.
+POST {{baseUrl}}/users/reissue
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTQ3NTE0NTUsImV4cCI6MTc1NTM1NjI1NX0.wu2erw4yBv5z5HPWvsWXTdNoBgbRVJqgkW512qxtubc"
+}
+
 ### ===================================================
 ###      👇 아래 API들은 아직 만들지 않았습니다! 👇
 ### ===================================================
 
 # 로그인 후 발급받은 토큰을 여기에 붙여넣으세요.
 @authToken = eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzIyMzA4NzE4LCJleHAiOjE3MjIzMTIzMTh9
-
-### 3. (미구현) 내 정보 조회 (Get My Info - 예시)
-# GET 요청 시 Authorization 헤더에 토큰을 포함시켜야 합니다.
-GET {{baseUrl}}/users/me
-Authorization: Bearer {{authToken}}
 
 
 ### 4. (미구현) 전체 회원 목록 조회 (Get All Users - 관리자용)

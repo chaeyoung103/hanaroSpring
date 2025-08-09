@@ -9,9 +9,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -19,26 +17,40 @@ public class JwtUtil {
 
 	private final SecretKey secretKey;
 	private final long accessTokenExpMs;
+	private final long refreshTokenExpMs;
 
 	public JwtUtil(
 		@Value("${jwt.secret.key}") String secret,
-		@Value("${jwt.token.expired-time-ms}") long accessTokenExpMs
+		@Value("${jwt.token.access-expired-time-ms}") long accessTokenExpMs,
+		@Value("${jwt.token.refresh-expired-time-ms}") long refreshTokenExpMs
 	) {
 		this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 		this.accessTokenExpMs = accessTokenExpMs;
+		this.refreshTokenExpMs = refreshTokenExpMs;
 	}
 
+	// Access Token 생성
 	public String createAccessToken(String email, String role) {
 		return Jwts.builder()
-			.setHeader(Map.of("typ", "JWT"))
 			.claim("email", email)
 			.claim("role", role)
-			.setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
+			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + accessTokenExpMs))
 			.signWith(secretKey)
 			.compact();
 	}
 
+	//Refresh Token 생성
+	public String createRefreshToken() {
+		return Jwts.builder()
+			.setIssuedAt(new Date(System.currentTimeMillis()))
+			.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpMs))
+			.signWith(secretKey)
+			.compact();
+	}
+
+
+	// 토큰 검증 및 Claims 추출
 	public Claims validateToken(String token) {
 		try {
 			return Jwts.parserBuilder()
@@ -47,11 +59,11 @@ public class JwtUtil {
 				.parseClaimsJws(token)
 				.getBody();
 		} catch (MalformedJwtException e) {
-			throw new CustomJwtException("Malformed Token"); // 형식이 잘못된 토큰
+			throw new CustomJwtException("Malformed Token");
 		} catch (ExpiredJwtException e) {
-			throw new CustomJwtException("Expired Token"); // 만료된 토큰
+			throw new CustomJwtException("Expired Token");
 		} catch (JwtException e) {
-			throw new CustomJwtException("Invalid Token"); // 그 외 유효하지 않은 토큰
+			throw new CustomJwtException("Invalid Token");
 		}
 	}
 }

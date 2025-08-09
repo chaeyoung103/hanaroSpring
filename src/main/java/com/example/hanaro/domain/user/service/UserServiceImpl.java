@@ -44,7 +44,8 @@ public class UserServiceImpl implements UserService {
 
 	// 로그인
 	@Override
-	public UserSignInResponseDto signIn(UserSignInRequestDto requestDto) { // [수정] 반환 타입 String -> UserSignInResponse
+	@Transactional
+	public UserSignInResponseDto signIn(UserSignInRequestDto requestDto) {
 		User user = userRepository.findByEmail(requestDto.getEmail())
 			.orElseThrow(() -> new UserException(USER_NOT_FOUND));
 
@@ -52,9 +53,28 @@ public class UserServiceImpl implements UserService {
 			throw new UserException(INVALID_PASSWORD);
 		}
 
-		// JWT 토큰 생성
-		String token = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
+		String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
+		String refreshToken = jwtUtil.createRefreshToken();
 
-		return new UserSignInResponseDto(token, user.getNickname(), user.getRole());
+		user.updateRefreshToken(refreshToken);
+		userRepository.save(user);
+
+		return new UserSignInResponseDto(accessToken, refreshToken, user.getNickname(), user.getRole());
+	}
+
+	// 리프레시 토큰으로 액세스 토큰 갱신
+	@Override
+	@Transactional
+	public UserSignInResponseDto reissueToken(String refreshToken) {
+		jwtUtil.validateToken(refreshToken);
+		User user = userRepository.findByRefreshToken(refreshToken)
+			.orElseThrow(() -> new UserException(INVALID_TOKEN));
+		String newAccessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
+		String newRefreshToken = jwtUtil.createRefreshToken();
+
+		user.updateRefreshToken(newRefreshToken);
+		userRepository.save(user);
+
+		return new UserSignInResponseDto(newAccessToken, newRefreshToken, user.getNickname(), user.getRole());
 	}
 }

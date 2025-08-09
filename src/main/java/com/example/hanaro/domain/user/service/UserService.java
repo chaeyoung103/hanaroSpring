@@ -18,4 +18,11 @@ public interface UserService {
 	 * @return JWT 토큰
 	 */
 	UserSignInResponseDto signIn(UserSignInRequestDto requestDto);
+
+	/**
+	 * 리프레시 토큰을 사용하여 액세스 토큰 갱신
+	 * @param refreshToken 리프레시 토큰
+	 * @return 새로운 액세스 토큰, 리프레시 토큰
+	 */
+	UserSignInResponseDto reissueToken(String refreshToken);
 }

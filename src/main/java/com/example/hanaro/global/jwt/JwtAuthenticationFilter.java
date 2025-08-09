@@ -40,22 +40,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 		String token = authorizationHeader.substring(7);
-		// JWT 예외 직접 처리
-		try {
-			Claims claims = jwtUtil.validateToken(token);
-			String email = claims.get("email", String.class);
-			String role = claims.get("role", String.class);
-			Authentication authentication = new UsernamePasswordAuthenticationToken(
-				email,
-				null,
-				Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-			);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+		Claims claims = jwtUtil.validateToken(token);
+		String email = claims.get("email", String.class);
+		String role = claims.get("role", String.class);
+		Authentication authentication = new UsernamePasswordAuthenticationToken(
+			email,
+			null,
+			Collections.singletonList(new SimpleGrantedAuthority(role))
+		);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		} catch (CustomJwtException e) {
-			sendErrorResponse(response, e);
-			return;
-		}
 		filterChain.doFilter(request, response);
 	}
 	private void sendErrorResponse(HttpServletResponse response, CustomJwtException e) throws IOException {

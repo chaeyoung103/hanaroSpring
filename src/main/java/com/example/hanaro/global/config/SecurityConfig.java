@@ -54,11 +54,12 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers( "users/signup","/users/signin", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+				.requestMatchers( "users/signup","/users/signin","users/reissue", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+
 			.exceptionHandling(exceptions -> exceptions
 				.accessDeniedHandler(customAccessDeniedHandler)
 				.authenticationEntryPoint(customAuthenticationEntryPoint)

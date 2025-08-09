@@ -15,10 +15,8 @@ import com.example.hanaro.global.entity.BaseEntity;
 @NoArgsConstructor
 @Table(name= "`User`")
 public class User extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -32,4 +30,10 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String role;
+
+    private String refreshToken;
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 }
