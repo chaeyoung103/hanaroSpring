@@ -1,5 +1,10 @@
 package com.example.hanaro.global.config;
 
+import com.example.hanaro.global.jwt.JwtAuthenticationFilter;
+import com.example.hanaro.global.jwt.JwtUtil;
+import com.example.hanaro.global.jwt.handler.CustomAccessDeniedHandler;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,36 +14,53 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-	// 비밀번호 암호화
+	private final JwtUtil jwtUtil;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler; // 1. 외부 핸들러 주입
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
-	// Spring Security의 필터 체인
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000"));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+		configuration.setAllowCredentials(true);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-			// CSRF(Cross-Site Request Forgery) 보호 기능 비활성화
+			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(AbstractHttpConfigurer::disable)
-
-			// JWT를 사용하므로 세션 관리는 STATELESS(상태 없음)로 설정
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-			// HTTP 요청에 대한 접근 권한 설정
 			.authorizeHttpRequests(auth -> auth
-				// '/users/signup', '/users/signin' API는 누구나 접근 가능
-				.requestMatchers("/users/signup", "/users/signin").permitAll()
-				// 그 외의 모든 API는 인증된 사용자만 접근 가능
+				.requestMatchers("/users/signup", "/users/signin", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
+			)
+			.addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+			.exceptionHandling(exceptions -> exceptions
+				.accessDeniedHandler(customAccessDeniedHandler)
 			);
-
-		// TODO: 다음 단계에서 만들 JWT 인증 필터를 여기에 추가할 예정입니다.
 
 		return http.build();
 	}

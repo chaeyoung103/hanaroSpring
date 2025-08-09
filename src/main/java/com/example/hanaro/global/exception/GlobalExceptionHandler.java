@@ -2,12 +2,14 @@ package com.example.hanaro.global.exception;
 
 import static com.example.hanaro.global.response.BaseErrorCode.*;
 
+import com.example.hanaro.global.jwt.exception.CustomJwtException;
 import com.example.hanaro.global.response.BaseErrorResponse;
 import com.example.hanaro.global.response.ErrorCode;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

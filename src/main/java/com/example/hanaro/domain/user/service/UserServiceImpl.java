@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 
-	// 회원가입 (이 부분은 수정할 필요 없습니다)
+	// 회원가입
 	@Override
 	@Transactional
 	public void signUp(UserSignUpRequestDto requestDto) {
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		// JWT 토큰 생성
-		String token = jwtUtil.createToken(user.getEmail(), user.getRole());
+		String token = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
 
 		return new UserSignInResponseDto(token, user.getNickname(), user.getRole());
 	}
