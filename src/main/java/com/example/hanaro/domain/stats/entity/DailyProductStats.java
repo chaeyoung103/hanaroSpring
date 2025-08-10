@@ -30,8 +30,8 @@ public class DailyProductStats extends BaseEntity {
     private Product product;
 
     @Column(name = "total_quantity_sold", nullable = false)
-    private Integer totalQuantitySold;
+    private int totalQuantitySold;
 
     @Column(name = "total_revenue", nullable = false)
-    private BigDecimal totalRevenue;
+    private int totalRevenue;
 }

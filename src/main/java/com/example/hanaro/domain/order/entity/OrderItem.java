@@ -35,7 +35,7 @@ public class OrderItem extends BaseEntity {
     private Product product;
 
     @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    private int price;
 
     @Column(nullable = false)
     private Integer quantity;

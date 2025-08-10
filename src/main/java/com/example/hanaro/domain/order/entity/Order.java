@@ -41,7 +41,7 @@ public class Order extends BaseEntity {
     private OrderStatus status;
 
     @Column(name = "total_price", nullable = false)
-    private BigDecimal totalPrice;
+    private int totalPrice;
 
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -25,8 +25,8 @@ public class DailySalesStats extends BaseEntity {
     private Date statsDate;
 
     @Column(name = "total_revenue", nullable = false)
-    private BigDecimal totalRevenue;
+    private int totalRevenue;
 
     @Column(name = "total_orders", nullable = false)
-    private Integer totalOrders;
+    private int totalOrders;
 }

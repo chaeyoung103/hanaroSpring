@@ -1,16 +1,14 @@
-### 1. 회원가입 (Sign Up)
-# Content-Type: application/json
+### 1. 회원가입
 POST {{baseUrl}}/users/signup
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "password": "password1234",
-  "nickname": "testuser"
+  "email": "test11@example.com",
+  "password": "password123411",
+  "nickname": "testuser11"
 }
 
-### 2. 로그인 (Sign In)
-# 로그인 성공 시 Body에 JWT 토큰이 반환
+### 2. 로그인
 POST {{baseUrl}}/users/signin
 Content-Type: application/json
 
@@ -19,8 +17,7 @@ Content-Type: application/json
   "password": "password1234"
 }
 
-### 3. 토큰 재발급 (Reissue Token)
-# POST 요청의 Body에 Refresh Token을 담아 보냅니다.
+### 3. 토큰 재발급
 POST {{baseUrl}}/users/reissue
 Content-Type: application/json
 
@@ -28,30 +25,19 @@ Content-Type: application/json
   "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTQ3NTE0NTUsImV4cCI6MTc1NTM1NjI1NX0.wu2erw4yBv5z5HPWvsWXTdNoBgbRVJqgkW512qxtubc"
 }
 
-### 4. 관리자 로그인 (Admin Sign In)
-POST {{baseUrl}}/users/signin
+### 4. 관리자 로그인 (관리자용)
+POST {{baseUrl}}/admin/signin
 Content-Type: application/json
 
 {
   "email": "hanaro",
-  "password": "password12345678"
+  "password": "12345678"
 }
 
-### ===================================================
-###      👇 아래 API들은 아직 만들지 않았습니다! 👇
-### ===================================================
-
-# 로그인 후 발급받은 토큰을 여기에 붙여넣으세요.
-@authToken = eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzIyMzA4NzE4LCJleHAiOjE3MjIzMTIzMTh9
-
-
-### 4. (미구현) 전체 회원 목록 조회 (Get All Users - 관리자용)
-# 이 API는 관리자(ADMIN) 권한이 필요하도록 만들어야 합니다.
+### 4. 전체 회원 목록 조회 (관리자용)
 GET {{baseUrl}}/admin/users
-Authorization: Bearer {{authToken}}
+Authorization: Bearer {{adminToken}}
 
-
-### 5. (미구현) 특정 회원 삭제 (Delete User - 관리자용)
-# 이 API도 관리자 권한이 필요합니다.
-DELETE {{baseUrl}}/admin/users/1
-Authorization: Bearer {{authToken}}
+### 5. 특정 회원 삭제 (관리자용)
+DELETE {{baseUrl}}/admin/users/3
+Authorization: Bearer {{adminToken}}

@@ -24,13 +24,13 @@ public class Product extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private int price;
 
     @Lob
     private String description;
 
     @Column(name = "stock_quantity", nullable = false)
-    private Integer stockQuantity;
+    private int stockQuantity;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImage> productImages = new ArrayList<>();
