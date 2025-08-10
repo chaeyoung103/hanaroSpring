@@ -2,6 +2,7 @@ package com.example.hanaro.global.util;
 
 import com.example.hanaro.domain.product.entity.Product;
 import com.example.hanaro.domain.product.entity.ProductImage;
+import com.example.hanaro.domain.product.exception.ProductException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.example.hanaro.domain.product.exception.ProductErrorCode.*;
 
 @Service
 public class FileUploadService {
@@ -40,8 +43,7 @@ public class FileUploadService {
 			Path savedPath = saveFile(multipartFile, datePath, uniqueFileName);
 
 			if (!isImageFile(savedPath)) {
-				// TODO: 이미지가 아닐 경우 예외 처리
-				throw new RuntimeException("이미지 파일만 업로드할 수 있습니다.");
+				throw new ProductException(INVALID_IMAGE_FILE);
 			}
 
 			String relativePath = "/upload/" + datePath + "/" + uniqueFileName;
@@ -75,12 +77,12 @@ public class FileUploadService {
 		long totalSize = 0;
 		for (MultipartFile file : multipartFiles) {
 			if (file.getSize() > MAX_FILE_SIZE) {
-				throw new RuntimeException("파일 크기는 512KB를 초과할 수 없습니다.");
+				throw new ProductException(FILE_SIZE_EXCEEDED);
 			}
 			totalSize += file.getSize();
 		}
 		if (totalSize > MAX_TOTAL_SIZE) {
-			throw new RuntimeException("총 파일 크기는 3MB를 초과할 수 없습니다.");
+			throw new ProductException(TOTAL_FILE_SIZE_EXCEEDED);
 		}
 	}
 

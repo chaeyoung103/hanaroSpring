@@ -36,5 +36,11 @@ public class Product extends BaseEntity {
     private int stockQuantity;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<ProductImage> productImages = new ArrayList<>();
+
+    public void addImage(ProductImage productImage) {
+        productImages.add(productImage);
+        productImage.setProduct(this);
+    }
 }

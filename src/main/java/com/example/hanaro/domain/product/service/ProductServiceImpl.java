@@ -43,17 +43,25 @@ public class ProductServiceImpl implements ProductService {
 			.stockQuantity(requestDto.getStockQuantity())
 			.build();
 
+		log.info("Product created with name: {}", product.getName());
+
 		List<MultipartFile> images = requestDto.getImages();
 		if (images != null && !images.isEmpty()) {
 			try {
+				log.info("Number of images to upload: {}", images.size());
 				List<ProductImage> uploadedImages = fileUploadService.uploadImages(product, images);
-				product.getProductImages().addAll(uploadedImages);
+				log.info("Number of images uploaded: {}", uploadedImages.size());
+				for (ProductImage image : uploadedImages) {
+					product.addImage(image);
+				}
+				log.info("Number of images in product after adding: {}", product.getProductImages().size());
 			} catch (IOException e) {
 				log.error("Image upload failed", e);
 				throw new ProductException(FILE_UPLOAD_FAILED);
 			}
 		}
 
+		log.info("Saving product with {} images", product.getProductImages() != null ? product.getProductImages().size() : 0);
 		productRepository.save(product);
 		log.info("새로운 상품이 등록되었습니다: {}", product.getName());
 	}

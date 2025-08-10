@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
 
 	private final ProductService productService;
@@ -30,6 +32,12 @@ public class ProductController {
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<BaseResponse<Void>> createProduct(@Valid @ModelAttribute ProductCreateRequestDto requestDto) {
+		log.info("Received request to create product: {}", requestDto.getName());
+		if (requestDto.getImages() != null) {
+			log.info("Number of images received in controller: {}", requestDto.getImages().size());
+		} else {
+			log.info("No images received in controller.");
+		}
 		productService.createProduct(requestDto);
 		return ResponseEntity.ok(new BaseResponse<>());
 	}

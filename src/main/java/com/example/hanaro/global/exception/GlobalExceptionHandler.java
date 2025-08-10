@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import com.example.hanaro.domain.product.exception.ProductException;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -61,4 +63,10 @@ public class GlobalExceptionHandler {
 		return new BaseErrorResponse(IMAGE_NOT_PRESENT);
 	}
 
+	@ExceptionHandler(ProductException.class)
+	public ResponseEntity<BaseErrorResponse> handleProductException(ProductException e) {
+		log.error("[handleProductException]", e);
+		return ResponseEntity.status(e.getErrorCode().getStatus())
+			.body(new BaseErrorResponse(e.getErrorCode()));
+	}
 }

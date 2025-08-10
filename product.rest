@@ -12,7 +12,7 @@ Content-Type: multipart/form-data; boundary=boundary
 --boundary
 Content-Disposition: form-data; name="name"
 
-새로운 상품 A
+새로운 상품 F
 --boundary
 Content-Disposition: form-data; name="price"
 
