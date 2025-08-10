@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "관리자 API", description = "관리자 전용 기능")
+
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class AdminController {
 
 	private final AdminService adminService;
 
+	@Tag(name = "[관리자] 인증", description = "관리자 전용 로그인")
 	@Operation(summary = "관리자 로그인", description = "관리자 계정으로 로그인합니다.")
 	@PostMapping("/signin")
 	public ResponseEntity<BaseResponse<UserSignInResponseDto>> signIn(@Valid @RequestBody AdminSignInRequestDto requestDto) {
@@ -32,7 +33,7 @@ public class AdminController {
 		return ResponseEntity.ok(new BaseResponse<>(response));
 	}
 
-
+	@Tag(name = "[관리자] 회원관리", description = "회원 관리 기능")
 	@Operation(summary = "전체 회원 목록 조회", description = "모든 사용자의 정보를 조회합니다. (ADMIN 권한 필요)")
 	@GetMapping("/users")
 	@PreAuthorize("hasRole('ADMIN')")
@@ -41,6 +42,7 @@ public class AdminController {
 		return ResponseEntity.ok(new BaseResponse<>(users));
 	}
 
+	@Tag(name = "[관리자] 회원관리", description = "회원 관리 기능")
 	@Operation(summary = "특정 회원 삭제", description = "사용자 ID로 회원을 삭제합니다. (ADMIN 권한 필요)")
 	@DeleteMapping("/users/{userId}")
 	@PreAuthorize("hasRole('ADMIN')")

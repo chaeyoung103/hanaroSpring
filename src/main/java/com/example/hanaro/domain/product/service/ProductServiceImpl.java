@@ -1,15 +1,16 @@
 package com.example.hanaro.domain.product.service;
 
 import com.example.hanaro.domain.product.dto.request.ProductCreateRequestDto;
+import com.example.hanaro.domain.product.dto.request.ProductStockUpdateRequestDto;
 import com.example.hanaro.domain.product.dto.response.ProductDto;
 import com.example.hanaro.domain.product.entity.Product;
 import com.example.hanaro.domain.product.entity.ProductImage;
 import com.example.hanaro.domain.product.exception.ProductException;
+import com.example.hanaro.domain.product.repository.ProductImageRepository;
 import com.example.hanaro.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,7 @@ import static com.example.hanaro.domain.product.exception.ProductErrorCode.*;
 public class ProductServiceImpl implements ProductService {
 
 	private final ProductRepository productRepository;
+	private final ProductImageRepository productImageRepository;
 
 	@Value("${file.upload-dir}")
 	private String uploadDir;
@@ -43,12 +45,11 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	@Transactional
 	public void createProduct(ProductCreateRequestDto requestDto) {
-		// 1. 상품명 중복 검사
+		// 상품명 중복 검사
 		if (productRepository.findByName(requestDto.getName()).isPresent()) {
 			throw new ProductException(DUPLICATE_PRODUCT_NAME);
 		}
 
-		// 2. Product 객체를 메모리에 생성 (아직 DB 저장 X)
 		Product product = Product.builder()
 			.name(requestDto.getName())
 			.price(requestDto.getPrice())
@@ -58,7 +59,6 @@ public class ProductServiceImpl implements ProductService {
 
 		List<MultipartFile> images = requestDto.getImages();
 
-		// 3. 이미지가 있다면 파일 처리 및 관계 설정 로직을 이 곳에서 직접 수행
 		if (images != null && !images.isEmpty()) {
 			validateFiles(images); // 파일 유효성 검사
 			String datePath = getDatePath();
@@ -68,16 +68,13 @@ public class ProductServiceImpl implements ProductService {
 
 				try {
 					String uniqueFileName = generateUniqueFileName(multipartFile.getOriginalFilename());
-					// 파일을 실제 경로에 저장
 					saveFile(multipartFile, datePath, uniqueFileName);
 
 					String relativePath = "/upload/" + datePath + "/" + uniqueFileName;
 
-					// ProductImage 객체 생성
 					ProductImage productImage = new ProductImage();
 					productImage.setImageUrl(relativePath);
 
-					// Product의 헬퍼 메서드를 사용해 양방향 관계를 설정 (가장 중요!)
 					product.addImage(productImage);
 
 				} catch (IOException e) {
@@ -86,29 +83,19 @@ public class ProductServiceImpl implements ProductService {
 				}
 			}
 		}
-
-		// 4. 모든 관계 설정이 끝난 후, Product를 한 번만 저장
-		// CascadeType.ALL 설정 덕분에 ProductImage도 함께 저장됨
 		productRepository.save(product);
-		log.info("새로운 상품이 등록되었습니다: {}", product.getName());
 	}
 
-	// [✨수정✨] 관리자용: 모든 상품을 조회합니다.
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProductDto> findAllProducts() {
-		log.info("관리자가 전체 상품 목록을 조회합니다.");
 		return productRepository.findAll().stream()
 			.map(ProductDto::fromEntity)
 			.collect(Collectors.toList());
 	}
-
-	// [✨새로운 코드✨] 사용자용: 키워드로 상품을 검색합니다.
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProductDto> searchProducts(String keyword) {
-		log.info("사용자가 상품을 검색합니다. 키워드: {}", keyword);
-		// 키워드가 없거나 비어있으면 모든 상품을 반환하고, 있으면 검색 결과를 반환합니다.
 		List<Product> products = (keyword == null || keyword.isBlank())
 			? productRepository.findAll()
 			: productRepository.findByNameContainingIgnoreCase(keyword);
@@ -118,8 +105,74 @@ public class ProductServiceImpl implements ProductService {
 			.collect(Collectors.toList());
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public ProductDto findProductById(Long productId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND));
 
-	// ---👇 Private Helper Methods ---
+		return ProductDto.fromEntity(product);
+	}
+
+	@Override
+	@Transactional
+	public void updateProduct(Long productId, ProductCreateRequestDto requestDto) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND));
+		product.setName(requestDto.getName());
+		product.setPrice(requestDto.getPrice());
+		product.setDescription(requestDto.getDescription());
+		product.setStockQuantity(requestDto.getStockQuantity());
+
+		// 새로운 이미지가 제공된 경우에만 처리
+		List<MultipartFile> newImages = requestDto.getImages();
+		if (newImages != null && !newImages.isEmpty()) {
+			// 기존 이미지 DB에서 삭제
+			productImageRepository.deleteAll(product.getProductImages());
+			product.getProductImages().clear();
+			// 새로운 이미지 추가
+			String datePath = getDatePath();
+			for (MultipartFile multipartFile : newImages) {
+				if (multipartFile.isEmpty()) continue;
+				try {
+					String uniqueFileName = generateUniqueFileName(multipartFile.getOriginalFilename());
+					saveFile(multipartFile, datePath, uniqueFileName);
+					String relativePath = "/upload/" + datePath + "/" + uniqueFileName;
+					ProductImage newProductImage = new ProductImage(relativePath, product);
+					product.addImage(newProductImage);
+				} catch (IOException e) {
+					throw new ProductException(FILE_UPLOAD_FAILED);
+				}
+			}
+		}
+
+		productRepository.save(product);
+	}
+
+	@Override
+	@Transactional
+	public void updateStock(Long productId, ProductStockUpdateRequestDto requestDto) {
+		// 1. 상품 조회
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND));
+
+		log.info("재고 수량을 수정합니다: (ID: {}, 기존 수량: {}, 새 수량: {})",
+			productId, product.getStockQuantity(), requestDto.getStockQuantity());
+
+		// 2. 재고 수량 변경
+		product.setStockQuantity(requestDto.getStockQuantity());
+
+		// 3. 변경된 내용 저장 (트랜잭션 종료 시 자동 반영)
+		productRepository.save(product);
+	}
+
+	@Override
+	@Transactional
+	public void deleteProduct(Long productId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND));
+		productRepository.delete(product);
+	}
 
 	private void saveFile(MultipartFile multipartFile, String datePath, String fileName) throws IOException {
 		String fullPathString = Paths.get(uploadDir, datePath).toString();
@@ -129,10 +182,7 @@ public class ProductServiceImpl implements ProductService {
 		}
 		Path filePath = Paths.get(fullPathString, fileName);
 		multipartFile.transferTo(filePath);
-
-		// 저장 후 이미지 파일이 맞는지 검사
 		if (!isImageFile(filePath)) {
-			// 이미지 파일이 아니면 저장했던 파일을 삭제하고 예외를 던지는 것이 좋음
 			Files.delete(filePath);
 			throw new ProductException(INVALID_IMAGE_FILE);
 		}
