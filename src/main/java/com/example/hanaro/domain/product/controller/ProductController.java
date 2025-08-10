@@ -86,7 +86,6 @@ public class ProductController {
 
 	@Tag(name = "[일반유저] 상품", description = "상품 관련 API (사용자용)")
 	@Operation(summary = "상품 목록 검색 (사용자용)", description = "키워드로 상품을 검색합니다. 키워드가 없으면 전체 목록이 조회됩니다.")
-	@GetMapping("/search")
 	public ResponseEntity<BaseResponse<List<ProductDto>>> searchProducts(
 		@RequestParam(required = false) String keyword) {
 		List<ProductDto> products = productService.searchProducts(keyword);
