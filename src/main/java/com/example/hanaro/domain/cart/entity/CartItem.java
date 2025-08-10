@@ -33,7 +33,7 @@ public class CartItem extends BaseEntity {
     private Product product;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private int quantity;
 
     public CartItem(Cart cart, Product product, int quantity) {
         this.cart = cart;
