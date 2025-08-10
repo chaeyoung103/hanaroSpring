@@ -1,6 +1,7 @@
 package com.example.hanaro.global.jwt.handler;
 
 import com.example.hanaro.domain.user.exception.UserErrorCode;
+import com.example.hanaro.global.response.BaseErrorCode;
 import com.example.hanaro.global.response.BaseErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -20,7 +21,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        BaseErrorResponse errorResponse = new BaseErrorResponse(UserErrorCode.INVALID_TOKEN);
+        BaseErrorResponse errorResponse = new BaseErrorResponse(BaseErrorCode.INVALID_TOKEN);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(response.getWriter(), errorResponse);

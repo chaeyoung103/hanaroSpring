@@ -7,6 +7,7 @@ import com.example.hanaro.global.jwt.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -38,7 +39,8 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000"));
+		// Swagger UI가 실행되는 Origin(localhost:8080)을 허용 목록에 추가
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8080"));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 		configuration.setAllowCredentials(true);
@@ -54,12 +56,18 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers( "users/signup","/users/signin","/admin/signin","users/reissue", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-				.requestMatchers("/admin/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+				.requestMatchers(
+					"/users/signup",
+					"/users/signin",
+					"/admin/signin",
+					"/users/reissue",
+					"/swagger-ui/**",
+					"/v3/api-docs/**"
+				).permitAll()
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
-
 			.exceptionHandling(exceptions -> exceptions
 				.accessDeniedHandler(customAccessDeniedHandler)
 				.authenticationEntryPoint(customAuthenticationEntryPoint)

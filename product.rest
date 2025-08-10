@@ -1,0 +1,73 @@
+# ===================================================
+#                상품 (Product) API
+# ===================================================
+
+### 1. 상품 등록 (관리자 권한)
+# [중요!] REST Client에서 multipart/form-data를 보내는 방식입니다.
+# 파일(images)과 JSON 데이터(dto)를 함께 보냅니다.
+POST {{baseUrl}}/products
+Authorization: Bearer {{adminToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="name"
+
+새로운 상품 A
+--boundary
+Content-Disposition: form-data; name="price"
+
+15000
+--boundary
+Content-Disposition: form-data; name="description"
+
+이것은 새로 등록하는 상품 A에 대한 설명입니다.
+--boundary
+Content-Disposition: form-data; name="stockQuantity"
+
+100
+--boundary
+# 아래 'images' 파트에서 '<' 뒤에 있는 경로에 실제 이미지 파일을 위치시켜야 합니다.
+# 예: /Users/yourname/Desktop/image1.jpg
+Content-Disposition: form-data; name="images"; filename="image1.png"
+Content-Type: image/png
+
+< /Users/songchaeyeong/Desktop/KakaoTalk_Photo_2025-08-10-16-28-04.png
+
+--boundary
+Content-Disposition: form-data; name="images"; filename="image2.png"
+Content-Type: image/png
+
+< /Users/songchaeyeong/Desktop/KakaoTalk_Photo_2025-08-10-16-28-04.png
+
+--boundary--
+
+
+### 2. 상품 목록 조회 (공용)
+# 이 API는 별도의 인증 토큰이 필요 없습니다.
+GET {{baseUrl}}/products
+
+
+### ===================================================
+###      👇 아래 API들은 아직 만들지 않았습니다! 👇
+### ===================================================
+
+### 3. (미구현) 특정 상품 상세 조회 (공용)
+GET {{baseUrl}}/products/1
+
+
+### 4. (미구현) 특정 상품 수정 (관리자 권한)
+PUT {{baseUrl}}/products/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "수정된 상품 A",
+  "price": 16000,
+  "description": "이것은 수정된 상품 A에 대한 설명입니다.",
+  "stockQuantity": 90
+}
+
+
+### 5. (미구현) 특정 상품 삭제 (관리자 권한)
+DELETE {{baseUrl}}/products/1
+Authorization: Bearer {{adminToken}}

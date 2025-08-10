@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice // 전역 예외 처리를 위한 어노테이션
+@RestControllerAdvice
 public class UserExceptionHandler {
 
 	/**
