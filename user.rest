@@ -28,6 +28,15 @@ Content-Type: application/json
   "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NTQ3NTE0NTUsImV4cCI6MTc1NTM1NjI1NX0.wu2erw4yBv5z5HPWvsWXTdNoBgbRVJqgkW512qxtubc"
 }
 
+### 4. 관리자 로그인 (Admin Sign In)
+POST {{baseUrl}}/users/signin
+Content-Type: application/json
+
+{
+  "email": "hanaro",
+  "password": "password12345678"
+}
+
 ### ===================================================
 ###      👇 아래 API들은 아직 만들지 않았습니다! 👇
 ### ===================================================

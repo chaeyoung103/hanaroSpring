@@ -53,28 +53,32 @@ public class UserServiceImpl implements UserService {
 			throw new UserException(INVALID_PASSWORD);
 		}
 
-		String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
-		String refreshToken = jwtUtil.createRefreshToken();
-
-		user.updateRefreshToken(refreshToken);
-		userRepository.save(user);
-
-		return new UserSignInResponseDto(accessToken, refreshToken, user.getNickname(), user.getRole());
+		return createAndSaveTokens(user);
 	}
 
-	// 리프레시 토큰으로 액세스 토큰 갱신
+	// 토큰 재발급
 	@Override
 	@Transactional
 	public UserSignInResponseDto reissueToken(String refreshToken) {
 		jwtUtil.validateToken(refreshToken);
 		User user = userRepository.findByRefreshToken(refreshToken)
 			.orElseThrow(() -> new UserException(INVALID_TOKEN));
-		String newAccessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
+
+		return createAndSaveTokens(user);
+	}
+
+	private UserSignInResponseDto createAndSaveTokens(User user) {
+		String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
 		String newRefreshToken = jwtUtil.createRefreshToken();
 
 		user.updateRefreshToken(newRefreshToken);
 		userRepository.save(user);
 
-		return new UserSignInResponseDto(newAccessToken, newRefreshToken, user.getNickname(), user.getRole());
+		return UserSignInResponseDto.builder()
+			.accessToken(accessToken)
+			.refreshToken(newRefreshToken)
+			.nickname(user.getNickname())
+			.role(user.getRole())
+			.build();
 	}
 }

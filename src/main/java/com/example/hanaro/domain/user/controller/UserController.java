@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "사용자 API", description = "회원가입, 로그인, 토큰 재발급")
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class UserController {
 
 	private final UserService userService;
 
+	@Tag(name = "사용자 API", description = "일반유저 회원가입, 로그인")
 	@Operation(summary = "회원가입", description = "새로운 사용자를 등록")
 	@ApiResponse(responseCode = "200", description = "회원가입 성공",
 		content = @Content(schema = @Schema(implementation = BaseResponse.class)))
@@ -36,6 +37,7 @@ public class UserController {
 		return ResponseEntity.ok(new BaseResponse<>());
 	}
 
+	@Tag(name = "사용자 API", description = "일반유저 회원가입, 로그인")
 	@Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 토큰을 발급받습니다.")
 	@ApiResponse(responseCode = "200", description = "로그인 성공",
 		content = @Content(schema = @Schema(implementation = BaseResponse.class)))
@@ -49,6 +51,7 @@ public class UserController {
 		return ResponseEntity.ok(new BaseResponse<>(response));
 	}
 
+	@Tag(name = "인증/공용 API", description = "토큰 재발급")
 	@Operation(summary = "토큰 재발급", description = "Refresh Token을 사용하여 새로운 Access/Refresh Token을 발급받습니다.")
 	@ApiResponse(responseCode = "200", description = "토큰 재발급 성공")
 	@ApiResponse(responseCode = "401", description = "유효하지 않은 Refresh Token",
