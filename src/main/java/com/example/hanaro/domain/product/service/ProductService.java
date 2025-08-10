@@ -15,9 +15,15 @@ public interface ProductService {
 	void createProduct(ProductCreateRequestDto requestDto);
 
 	/**
-	 * 상품 목록 조회 (사용자/관리자 공용)
-	 * @param authentication 현재 사용자 인증 정보
-	 * @return 상품 DTO 리스트
+	 * 상품 목록 전체 조회 (관리자용)
+	 * @return 전체 상품 DTO 리스트
 	 */
-	List<ProductDto> findProducts(Authentication authentication);
+	List<ProductDto> findAllProducts();
+
+	/**
+	 * 상품 목록 검색 (사용자용)
+	 * @param keyword 검색할 키워드
+	 * @return 검색된 상품 DTO 리스트
+	 */
+	List<ProductDto> searchProducts(String keyword);
 }

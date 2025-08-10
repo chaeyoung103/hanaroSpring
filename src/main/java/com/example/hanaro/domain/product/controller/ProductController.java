@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,10 +41,20 @@ public class ProductController {
 		return ResponseEntity.ok(new BaseResponse<>());
 	}
 
-	@Operation(summary = "상품 목록 조회 (공용)", description = "모든 사용자가 상품 목록을 조회합니다.")
+	@Operation(summary = "상품 목록 전체 조회 (관리자용)", description = "시스템의 모든 상품 목록을 조회합니다.")
+	@SecurityRequirement(name = "JWT Authentication")
 	@GetMapping
-	public ResponseEntity<BaseResponse<List<ProductDto>>> getProducts(Authentication authentication) {
-		List<ProductDto> products = productService.findProducts(authentication);
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<BaseResponse<List<ProductDto>>> getAllProducts() {
+		List<ProductDto> products = productService.findAllProducts();
+		return ResponseEntity.ok(new BaseResponse<>(products));
+	}
+
+	@Operation(summary = "상품 목록 검색 (사용자용)", description = "키워드로 상품을 검색합니다. 키워드가 없으면 전체 목록이 조회됩니다.")
+	@GetMapping("/search")
+	public ResponseEntity<BaseResponse<List<ProductDto>>> searchProducts(
+		@RequestParam(required = false) String keyword) {
+		List<ProductDto> products = productService.searchProducts(keyword);
 		return ResponseEntity.ok(new BaseResponse<>(products));
 	}
 }

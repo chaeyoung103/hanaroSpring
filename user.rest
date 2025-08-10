@@ -13,8 +13,8 @@ POST {{baseUrl}}/users/signin
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "password": "password1234"
+  "email": "test11@example.com",
+  "password": "password123411"
 }
 
 ### 3. 토큰 재발급
