@@ -20,7 +20,7 @@ public interface CartService {
 	CartResponseDto getCart(Long userId);
 
 	/**
-	 * [✨새로운 코드✨] 장바구니 상품 수량 변경
+	 * 장바구니 상품 수량 변경
 	 * @param userId 현재 로그인한 사용자의 ID
 	 * @param cartItemId 수정할 장바구니 상품의 ID
 	 * @param requestDto 변경할 수량 정보
@@ -28,7 +28,7 @@ public interface CartService {
 	void updateCartItemQuantity(Long userId, Long cartItemId, CartItemUpdateRequestDto requestDto);
 
 	/**
-	 * [✨새로운 코드✨] 장바구니 상품 삭제
+	 * 장바구니 상품 삭제
 	 * @param userId 현재 로그인한 사용자의 ID
 	 * @param cartItemId 삭제할 장바구니 상품의 ID
 	 */

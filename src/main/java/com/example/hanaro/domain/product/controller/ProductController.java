@@ -23,7 +23,7 @@ public class ProductController {
 
 	private final ProductService productService;
 
-	@Operation(summary = "상품 목록 검색 (사용자용)", description = "키워드로 상품을 검색합니다. 키워드가 없으면 전체 목록이 조회됩니다.")
+	@Operation(summary = "상품 목록 검색", description = "키워드로 상품을 검색합니다. 키워드가 없으면 전체 목록이 조회됩니다.")
 	@SecurityRequirement(name = "JWT Authentication")
 	@GetMapping("/search")
 	public ResponseEntity<BaseResponse<List<ProductDto>>> searchProducts(
@@ -32,7 +32,7 @@ public class ProductController {
 		return ResponseEntity.ok(new BaseResponse<>(products));
 	}
 
-	@Operation(summary = "상품 상세 조회 (로그인 유저 공용)", description = "상품 ID로 특정 상품의 상세 정보를 조회합니다.")
+	@Operation(summary = "상품 상세 조회", description = "상품 ID로 특정 상품의 상세 정보를 조회합니다.")
 	@SecurityRequirement(name = "JWT Authentication")
 	@GetMapping("/{productId}")
 	public ResponseEntity<BaseResponse<ProductDto>> getProductById(@PathVariable Long productId) {
