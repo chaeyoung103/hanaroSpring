@@ -56,30 +56,29 @@ CREATE DATABASE hanarodb;
 
 아래 내용을 복사하여 붙여넣고, 자신의 MySQL 계정 정보에 맞게 수정합니다.
 
-Properties
-
-## SERVER
-server.port=8080
-
-## DATABASE
-spring.datasource.url=jdbc:mysql://localhost:3306/hanarodb
+>### Properties
+>##### SERVER
+>server.port=8080
+>
+>##### DATABASE
+>spring.datasource.url=jdbc:mysql://localhost:3306/hanarodb
 spring.datasource.username=[DB_사용자명]
 spring.datasource.password=[DB_비밀번호]
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-## JPA
-spring.jpa.hibernate.ddl-auto=update
+>
+>##### JPA
+>spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
-
-## JWT SECRET KEY
-jwt.secret.key=[32자 이상의 JWT 시크릿 키]
-
-## FILE UPLOAD DIR
-file.upload-dir=src/main/resources/static/
-
-## ACTUATOR
-management.server.port=9001
+>
+>##### JWT SECRET KEY
+>jwt.secret.key=[32자 이상의 JWT 시크릿 키]
+>
+>##### FILE UPLOAD DIR
+>file.upload-dir=src/main/resources/static/
+>
+>##### ACTUATOR
+>management.server.port=9001
 management.endpoints.web.exposure.include=*
 management.endpoint.health.show-details=always
 management.endpoint.shutdown.enabled=true
