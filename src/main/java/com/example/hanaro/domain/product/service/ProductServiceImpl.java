@@ -35,6 +35,7 @@ import static com.example.hanaro.domain.product.exception.ProductErrorCode.*;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
+
 	private final ProductRepository productRepository;
 	private final ProductImageRepository productImageRepository;
 	private final OrderItemRepository orderItemRepository;
@@ -45,15 +46,11 @@ public class ProductServiceImpl implements ProductService {
 	private final long MAX_FILE_SIZE = 512 * 1024; // 512KB
 	private final long MAX_TOTAL_SIZE = 3 * 1024 * 1024; // 3MB
 
-	/**
-	 * 새로운 상품을 등록합니다.
-	 * @param requestDto 상품 정보 및 이미지 파일
-	 */
+	// 관리자 - 상품 등록
 	@Override
 	@Transactional
 	public void createProduct(ProductCreateRequestDto requestDto) {
 		log.info("======== 상품 등록 시작: {} ========", requestDto.getName());
-		// 상품명 중복 검사
 		if (productRepository.findByName(requestDto.getName()).isPresent()) {
 			throw new ProductException(DUPLICATE_PRODUCT_NAME);
 		}
@@ -76,11 +73,16 @@ public class ProductServiceImpl implements ProductService {
 
 				try {
 					String uniqueFileName = generateUniqueFileName(multipartFile.getOriginalFilename());
+
+					saveOriginalFile(multipartFile, uniqueFileName);
+
 					saveFile(multipartFile, datePath, uniqueFileName);
+
 					String relativePath = "/upload/" + datePath + "/" + uniqueFileName;
 					ProductImage productImage = new ProductImage();
 					productImage.setImageUrl(relativePath);
 					product.addImage(productImage);
+
 				} catch (IOException e) {
 					log.error("Image upload failed", e);
 					throw new ProductException(FILE_UPLOAD_FAILED);
@@ -198,19 +200,6 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	// 헬퍼 메소드들
-	private void saveFile(MultipartFile multipartFile, String datePath, String fileName) throws IOException {
-		String fullPathString = Paths.get(uploadDir, datePath).toString();
-		File directory = new File(fullPathString);
-		if (!directory.exists()) {
-			directory.mkdirs();
-		}
-		Path filePath = Paths.get(fullPathString, fileName);
-		multipartFile.transferTo(filePath);
-		if (!isImageFile(filePath)) {
-			Files.delete(filePath);
-			throw new ProductException(INVALID_IMAGE_FILE);
-		}
-	}
 
 	private boolean isImageFile(Path filePath) throws IOException {
 		String contentType = Files.probeContentType(filePath);
@@ -241,4 +230,36 @@ public class ProductServiceImpl implements ProductService {
 		}
 		return UUID.randomUUID().toString() + ext;
 	}
+
+	private void saveOriginalFile(MultipartFile multipartFile, String uniqueFileName) throws IOException {
+		Path originDirPath = Paths.get(uploadDir, "origin");
+		if (!Files.exists(originDirPath)) {
+			Files.createDirectories(originDirPath);
+		}
+
+		String originalFilename = multipartFile.getOriginalFilename();
+		String storedOriginalName = uniqueFileName.substring(0, uniqueFileName.lastIndexOf("."))
+			+ "_" + originalFilename;
+
+		Path filePath = originDirPath.resolve(storedOriginalName);
+		multipartFile.transferTo(filePath);
+		log.info(" >> 원본 파일 저장 완료: {}", filePath);
+	}
+
+	private void saveFile(MultipartFile multipartFile, String datePath, String fileName) throws IOException {
+		String fullPathString = Paths.get(uploadDir, "upload", datePath).toString();
+		log.info(" >> 파일 저장 경로: {}", fullPathString);
+		File directory = new File(fullPathString);
+		if (!directory.exists()) {
+			directory.mkdirs();
+		}
+		Path filePath = Paths.get(fullPathString, fileName);
+		multipartFile.transferTo(filePath);
+		if (!isImageFile(filePath)) {
+			Files.delete(filePath);
+			throw new ProductException(INVALID_IMAGE_FILE);
+		}
+	}
+
+
 }
