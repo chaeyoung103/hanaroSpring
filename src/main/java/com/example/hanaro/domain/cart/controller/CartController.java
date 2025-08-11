@@ -63,7 +63,7 @@ public class CartController {
 		@PathVariable Long cartItemId,
 		@Valid @RequestBody CartItemUpdateRequestDto requestDto) {
 
-		Long userId = getUserIdFromAuthentication(); // 사용자 ID 가져오는 로직은 메서드로 분리
+		Long userId = getUserIdFromAuthentication();
 		cartService.updateCartItemQuantity(userId, cartItemId, requestDto);
 		return ResponseEntity.ok(new BaseResponse<>());
 	}
@@ -77,7 +77,6 @@ public class CartController {
 		return ResponseEntity.ok(new BaseResponse<>());
 	}
 
-	// 사용자 ID를 가져오는 중복 코드를 private 메서드로 분리하여 가독성 향상
 	private Long getUserIdFromAuthentication() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String userEmail = authentication.getName();

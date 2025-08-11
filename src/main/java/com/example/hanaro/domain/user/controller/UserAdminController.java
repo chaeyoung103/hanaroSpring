@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "JWT Authentication")
-public class AdminController {
+public class UserAdminController {
 
 	private final AdminService adminService;
 
