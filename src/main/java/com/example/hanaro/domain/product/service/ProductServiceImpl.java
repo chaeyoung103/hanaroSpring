@@ -1,16 +1,21 @@
 package com.example.hanaro.domain.product.service;
 
+import com.example.hanaro.domain.order.repository.OrderItemRepository;
 import com.example.hanaro.domain.product.dto.request.ProductCreateRequestDto;
 import com.example.hanaro.domain.product.dto.request.ProductStockUpdateRequestDto;
 import com.example.hanaro.domain.product.dto.response.ProductDto;
 import com.example.hanaro.domain.product.entity.Product;
 import com.example.hanaro.domain.product.entity.ProductImage;
+import com.example.hanaro.domain.product.exception.ProductErrorCode;
 import com.example.hanaro.domain.product.exception.ProductException;
 import com.example.hanaro.domain.product.repository.ProductImageRepository;
 import com.example.hanaro.domain.product.repository.ProductRepository;
+
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
 
 	private final ProductRepository productRepository;
 	private final ProductImageRepository productImageRepository;
+	private final OrderItemRepository orderItemRepository;
 
 	@Value("${file.upload-dir}")
 	private String uploadDir;
@@ -171,8 +177,14 @@ public class ProductServiceImpl implements ProductService {
 	public void deleteProduct(Long productId) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND));
+
+		if (orderItemRepository.existsByProduct(product)) {
+			throw new ProductException(ProductErrorCode.PRODUCT_IN_USE);
+		}
+
 		productRepository.delete(product);
 	}
+
 
 	private void saveFile(MultipartFile multipartFile, String datePath, String fileName) throws IOException {
 		String fullPathString = Paths.get(uploadDir, datePath).toString();

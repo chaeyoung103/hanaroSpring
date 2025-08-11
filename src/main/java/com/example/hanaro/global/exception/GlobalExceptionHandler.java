@@ -1,8 +1,9 @@
 package com.example.hanaro.global.exception;
 
 import static com.example.hanaro.global.response.BaseErrorCode.*;
+import static org.springframework.http.HttpStatus.*;
 
-import com.example.hanaro.global.jwt.exception.CustomJwtException;
+import com.example.hanaro.global.response.BaseErrorCode;
 import com.example.hanaro.global.response.BaseErrorResponse;
 import com.example.hanaro.global.response.ErrorCode;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -68,5 +69,12 @@ public class GlobalExceptionHandler {
 		log.error("[handleProductException]", e);
 		return ResponseEntity.status(e.getErrorCode().getStatus())
 			.body(new BaseErrorResponse(e.getErrorCode()));
+	}
+
+	@ExceptionHandler(Exception.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public BaseErrorResponse handleException(Exception e) {
+		log.error("[handleException]", e);
+		return new BaseErrorResponse(BaseErrorCode.INTERNAL_SERVER_ERROR);
 	}
 }
