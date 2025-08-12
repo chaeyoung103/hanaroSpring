@@ -1,6 +1,8 @@
 package com.example.hanaro.global.config;
 
 import com.example.hanaro.domain.order.entity.Order;
+import com.example.hanaro.global.batch.JobCompletionNotificationListener;
+
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +44,9 @@ public class BatchConfig {
 	@Bean
 	public Step summarizeDailySalesStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		return new StepBuilder("summarizeDailySalesStep", jobRepository)
-			.<Order, Order>chunk(100, transactionManager) // [✨수정✨] Processor가 없으므로 <Order, Order>
+			.<Order, Order>chunk(100, transactionManager)
 			.reader(orderReader(null))
-			// .processor(salesStatsProcessor()) // [✨제거✨] Processor는 더 이상 필요 없음
-			.writer(salesStatsWriter()) // [✨수정✨] Writer의 역할이 변경됨
+			.writer(salesStatsWriter())
 			.build();
 	}
 

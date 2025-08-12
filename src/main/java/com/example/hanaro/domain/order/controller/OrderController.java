@@ -1,14 +1,18 @@
 package com.example.hanaro.domain.order.controller;
 
-
 import java.util.List;
 
 import com.example.hanaro.domain.order.dto.response.OrderCreateResponseDto;
 import com.example.hanaro.domain.order.dto.response.OrderResponseDto;
 import com.example.hanaro.domain.order.service.OrderService;
 import com.example.hanaro.domain.user.repository.UserRepository;
+import com.example.hanaro.global.response.BaseErrorResponse;
 import com.example.hanaro.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "[일반유저] 주문", description = "주문 관련 기능")
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -29,6 +33,12 @@ public class OrderController {
 
 	@Operation(summary = "주문 생성", description = "장바구니에 담긴 모든 상품으로 주문을 생성합니다.")
 	@SecurityRequirement(name = "JWT Authentication")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "주문 생성 성공"),
+		@ApiResponse(responseCode = "400", description = "장바구니가 비어있음", content = @Content(schema = @Schema(implementation = BaseErrorResponse.class))),
+		@ApiResponse(responseCode = "404", description = "사용자 또는 장바구니를 찾을 수 없음", content = @Content(schema = @Schema(implementation = BaseErrorResponse.class))),
+		@ApiResponse(responseCode = "409", description = "상품 재고 부족", content = @Content(schema = @Schema(implementation = BaseErrorResponse.class)))
+	})
 	@PostMapping
 	public ResponseEntity<BaseResponse<OrderCreateResponseDto>> createOrder() {
 		Long userId = getUserIdFromAuthentication();
@@ -38,6 +48,10 @@ public class OrderController {
 
 	@Operation(summary = "내 주문 내역 조회", description = "자신의 모든 주문 내역을 최신순으로 조회합니다.")
 	@SecurityRequirement(name = "JWT Authentication")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "주문 내역 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "존재하지 않는 사용자", content = @Content(schema = @Schema(implementation = BaseErrorResponse.class)))
+	})
 	@GetMapping
 	public ResponseEntity<BaseResponse<List<OrderResponseDto>>> getMyOrders() {
 		Long userId = getUserIdFromAuthentication();

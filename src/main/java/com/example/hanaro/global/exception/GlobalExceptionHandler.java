@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -71,6 +72,19 @@ public class GlobalExceptionHandler {
 			.body(new BaseErrorResponse(e.getErrorCode()));
 	}
 
+	/**
+	 * @PreAuthorize 등에서 권한이 없는 요청이 들어왔을 때 발생
+	 */
+	@ExceptionHandler(AccessDeniedException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public BaseErrorResponse handleAccessDeniedException(AccessDeniedException e) {
+		log.warn("[handleAccessDeniedException]", e);
+		return new BaseErrorResponse(BaseErrorCode.ACCESS_DENIED);
+	}
+
+	/**
+	 * 모든 예상치 못한 예외를 처리하는 최종 핸들러
+	 */
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public BaseErrorResponse handleException(Exception e) {

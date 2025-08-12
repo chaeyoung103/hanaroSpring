@@ -136,7 +136,16 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ProductException(PRODUCT_NOT_FOUND));
 
-		product.setName(requestDto.getName());
+		String newName = requestDto.getName();
+
+		if (!product.getName().equals(newName)) {
+			if (productRepository.findByName(newName).isPresent()) {
+				log.error(" >> 상품 수정 실패: 이미 존재하는 상품명입니다. ({})", newName);
+				throw new ProductException(DUPLICATE_PRODUCT_NAME);
+			}
+		}
+
+		product.setName(newName);
 		product.setPrice(requestDto.getPrice());
 		product.setDescription(requestDto.getDescription());
 		product.setStockQuantity(requestDto.getStockQuantity());

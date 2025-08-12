@@ -17,6 +17,8 @@ import com.example.hanaro.domain.user.entity.User;
 import com.example.hanaro.domain.user.exception.UserException;
 import com.example.hanaro.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.example.hanaro.domain.product.exception.ProductErrorCode.PRODUCT_NOT_FOUND;
 import static com.example.hanaro.domain.user.exception.UserErrorCode.USER_NOT_FOUND;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -55,14 +57,23 @@ public class CartServiceImpl implements CartService {
 
 		Optional<CartItem> cartItemOptional = cartItemRepository.findByCartAndProduct(cart, product);
 
+		int currentQuantityInCart = cartItemOptional.map(CartItem::getQuantity).orElse(0);
+		int requestedTotalQuantity = currentQuantityInCart + requestDto.getQuantity();
+
+		if (product.getStockQuantity() < requestedTotalQuantity) {
+			log.warn(" >> 재고 부족! 상품명: {}, 현재 재고: {}, 요청 수량: {}",
+				product.getName(), product.getStockQuantity(), requestedTotalQuantity);
+			throw new CartException(CartErrorCode.INSUFFICIENT_STOCK);
+		}
+
 		if (cartItemOptional.isPresent()) {
 			CartItem cartItem = cartItemOptional.get();
-			cartItem.setQuantity(cartItem.getQuantity() + requestDto.getQuantity());
-			cartItemRepository.save(cartItem);
+			cartItem.setQuantity(requestedTotalQuantity);
 		} else {
 			CartItem newCartItem = new CartItem(cart, product, requestDto.getQuantity());
-			cartItemRepository.save(newCartItem);
+			cart.getCartItems().add(newCartItem);
 		}
+		cartRepository.save(cart);
 	}
 
 	@Override
@@ -105,7 +116,16 @@ public class CartServiceImpl implements CartService {
 			throw new CartException(CartErrorCode.ACCESS_DENIED_CART_ITEM);
 		}
 
-		cartItem.setQuantity(requestDto.getQuantity());
+		Product product = cartItem.getProduct();
+		int requestedQuantity = requestDto.getQuantity();
+
+		if (product.getStockQuantity() < requestedQuantity) {
+			log.warn(" >> 재고 부족! 상품명: {}, 현재 재고: {}, 요청 수량: {}",
+				product.getName(), product.getStockQuantity(), requestedQuantity);
+			throw new CartException(CartErrorCode.INSUFFICIENT_STOCK);
+		}
+
+		cartItem.setQuantity(requestedQuantity);
 	}
 
 	@Override

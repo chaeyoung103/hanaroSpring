@@ -18,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static com.example.hanaro.global.response.BaseErrorCode.INVALID_TOKEN;
 
@@ -28,9 +30,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
 	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	private static final List<String> PERMIT_ALL_URLS = Arrays.asList(
+		"/api/users/signup",
+		"/api/users/signin",
+		"/api/admin/signin",
+		"/api/users/reissue"
+	);
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		throws ServletException, IOException {
+
+		String path = request.getRequestURI();
+		if (PERMIT_ALL_URLS.contains(path)) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		String authorizationHeader = request.getHeader("Authorization");
 
@@ -48,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			Authentication authentication = new UsernamePasswordAuthenticationToken(
 				email,
 				null,
-				Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+				Collections.singletonList(new SimpleGrantedAuthority(role))
 			);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 

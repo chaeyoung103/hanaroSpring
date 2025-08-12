@@ -2,11 +2,15 @@ package com.example.hanaro.domain.product.controller;
 
 import com.example.hanaro.domain.product.dto.response.ProductDto;
 import com.example.hanaro.domain.product.service.ProductService;
+import com.example.hanaro.global.response.BaseErrorResponse;
 import com.example.hanaro.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +20,7 @@ import java.util.List;
 
 @Tag(name = "[일반유저] 상품", description = "상품 관련 API (사용자용)")
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {
@@ -25,6 +29,7 @@ public class ProductController {
 
 	@Operation(summary = "상품 목록 검색", description = "키워드로 상품을 검색합니다. 키워드가 없으면 전체 목록이 조회됩니다.")
 	@SecurityRequirement(name = "JWT Authentication")
+	@ApiResponse(responseCode = "200", description = "상품 검색 성공")
 	@GetMapping("/search")
 	public ResponseEntity<BaseResponse<List<ProductDto>>> searchProducts(
 		@RequestParam(required = false) String keyword) {
@@ -34,6 +39,10 @@ public class ProductController {
 
 	@Operation(summary = "상품 상세 조회", description = "상품 ID로 특정 상품의 상세 정보를 조회합니다.")
 	@SecurityRequirement(name = "JWT Authentication")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "상품 상세 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "존재하지 않는 상품", content = @Content(schema = @Schema(implementation = BaseErrorResponse.class)))
+	})
 	@GetMapping("/{productId}")
 	public ResponseEntity<BaseResponse<ProductDto>> getProductById(@PathVariable Long productId) {
 		ProductDto product = productService.findProductById(productId);

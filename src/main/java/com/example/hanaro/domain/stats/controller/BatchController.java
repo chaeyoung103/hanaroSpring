@@ -18,7 +18,7 @@ public class BatchController {
 	private final JobLauncher jobLauncher;
 	private final Job dailySalesStatsJob;
 
-	@GetMapping("/batch/run")
+	@GetMapping("/api/batch/run")
 	public String runBatchJob(@RequestParam(name = "date", required = false) String dateStr) throws Exception {
 
 		String jobDate = (dateStr == null) ? LocalDate.now().minusDays(1).toString() : dateStr;
