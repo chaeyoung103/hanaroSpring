@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class BaseEntity {
     @CreationTimestamp
     @Column(updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

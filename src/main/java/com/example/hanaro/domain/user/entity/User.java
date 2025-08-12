@@ -1,9 +1,11 @@
 package com.example.hanaro.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.sql.Timestamp;
 
@@ -14,6 +16,7 @@ import com.example.hanaro.global.entity.BaseEntity;
 @Setter
 @NoArgsConstructor
 @Table(name= "`User`")
+@SuperBuilder
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

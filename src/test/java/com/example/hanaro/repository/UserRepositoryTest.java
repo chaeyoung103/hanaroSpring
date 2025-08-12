@@ -37,35 +37,47 @@ public class UserRepositoryTest extends RepositoryTest {
 	// 각 테스트가 실행되기 전에 테스트용 유저를 미리 저장
 	@BeforeEach
 	void setUp() {
-		userRepository.deleteAll();
-
-		testUser = new User();
-		testUser.setEmail("testuser@example.com");
-		testUser.setPassword(passwordEncoder.encode("password1234"));
-		testUser.setNickname("testuser");
-		testUser.setRole("ROLE_USER");
-		userRepository.save(testUser);
+		userRepository.deleteAll(); // 테스트 독립성 보장
+		User user = User.builder()
+			.email("test@example.com")
+			.password(passwordEncoder.encode("password1234"))
+			.nickname("tester")
+			.role("ROLE_USER")
+			.refreshToken("dummy-refresh-token")
+			.build();
+		userRepository.save(user);
 	}
 
-
 	@Test
-	@DisplayName("이메일로 사용자 조회 성공")
+	@DisplayName("이메일로 사용자를 성공적으로 조회한다")
 	void findByEmail_Success() {
-		Optional<User> foundUser = userRepository.findByEmail("testuser@example.com");
-
-		assertThat(foundUser).isPresent();
-		assertThat(foundUser.get().getNickname()).isEqualTo("testuser");
-	}
-
-	@Test
-	@DisplayName("닉네임으로 사용자 조회 성공")
-	void findByNickname_Success() {
 		// when
-		Optional<User> foundUser = userRepository.findByNickname("testuser");
-
+		Optional<User> foundUser = userRepository.findByEmail("test@example.com");
 		// then
 		assertThat(foundUser).isPresent();
-		assertThat(foundUser.get().getEmail()).isEqualTo("testuser@example.com");
+		assertThat(foundUser.get().getNickname()).isEqualTo("tester");
 	}
+
+	@Test
+	@DisplayName("닉네임으로 사용자를 성공적으로 조회한다")
+	void findByNickname_Success() {
+		// when
+		Optional<User> foundUser = userRepository.findByNickname("tester");
+		// then
+		assertThat(foundUser).isPresent();
+		assertThat(foundUser.get().getEmail()).isEqualTo("test@example.com");
+	}
+
+	@Test
+	@DisplayName("리프레시 토큰으로 사용자를 성공적으로 조회한다")
+	void findByRefreshToken_Success() {
+		// when
+		Optional<User> foundUser = userRepository.findByRefreshToken("dummy-refresh-token");
+		// then
+		assertThat(foundUser).isPresent();
+		assertThat(foundUser.get().getEmail()).isEqualTo("test@example.com");
+	}
+
+
 
 }
