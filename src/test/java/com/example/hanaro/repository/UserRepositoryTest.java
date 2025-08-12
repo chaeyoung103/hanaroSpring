@@ -34,10 +34,9 @@ public class UserRepositoryTest extends RepositoryTest {
 
 	private User testUser;
 
-	// 각 테스트가 실행되기 전에 테스트용 유저를 미리 저장
 	@BeforeEach
 	void setUp() {
-		userRepository.deleteAll(); // 테스트 독립성 보장
+		userRepository.deleteAll();
 		User user = User.builder()
 			.email("test@example.com")
 			.password(passwordEncoder.encode("password1234"))
