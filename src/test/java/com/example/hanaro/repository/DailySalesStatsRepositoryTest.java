@@ -5,6 +5,7 @@ import com.example.hanaro.domain.stats.repository.DailySalesStatsRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class DailySalesStatsRepositoryTest extends RepositoryTest {
 
@@ -37,16 +37,34 @@ public class DailySalesStatsRepositoryTest extends RepositoryTest {
         stats.setStatsDate(testDate);
         stats.setTotalRevenue(100000);
         stats.setTotalOrders(25);
+
         entityManager.persistAndFlush(stats);
     }
 
     @Test
+    @Order(1)
     @DisplayName("특정 날짜의 일일 매출 통계를 성공적으로 조회한다")
     void findByStatsDateTest() {
-        Optional<DailySalesStats> found = dailySalesStatsRepository.findByStatsDate(Date.valueOf(LocalDate.of(2025, 8, 12)));
+        // when
+        Optional<DailySalesStats> found = dailySalesStatsRepository.findByStatsDate(testDate);
 
+        // then
         assertThat(found).isPresent();
         assertThat(found.get().getTotalRevenue()).isEqualTo(100000);
         assertThat(found.get().getTotalOrders()).isEqualTo(25);
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("존재하지 않는 날짜로 조회 시 빈 Optional을 반환한다")
+    void findByNonExistentDateTest() {
+        // given
+        Date nonExistentDate = Date.valueOf(LocalDate.of(2025, 8, 13));
+
+        // when
+        Optional<DailySalesStats> found = dailySalesStatsRepository.findByStatsDate(nonExistentDate);
+
+        // then
+        assertThat(found).isEmpty();
     }
 }
