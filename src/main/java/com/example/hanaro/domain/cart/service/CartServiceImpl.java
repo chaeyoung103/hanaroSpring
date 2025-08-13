@@ -140,4 +140,18 @@ public class CartServiceImpl implements CartService {
 
 		cartItemRepository.delete(cartItem);
 	}
+
+	@Override
+	@Transactional
+	public void deleteCart(Long userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserException(USER_NOT_FOUND));
+
+		Cart cart = cartRepository.findByUser(user)
+			.orElseThrow(() -> new CartException(CartErrorCode.CART_NOT_FOUND));
+
+		cartItemRepository.deleteAll(cart.getCartItems());
+		cart.getCartItems().clear();
+		cartRepository.save(cart);
+	}
 }

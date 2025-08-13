@@ -23,7 +23,7 @@ public class ProductCreateRequestDto {
 	private String description;
 
 	@NotNull(message = "재고는 필수 입력 값입니다.")
-	@Min(value = 0, message = "재고는 0 이상이어야 합니다.")
+	@Min(value = 1, message = "재고는 1 이상이어야 합니다.")
 	private int stockQuantity;
 
 	private List<MultipartFile> images;

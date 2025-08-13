@@ -15,7 +15,8 @@ public enum ProductErrorCode implements ErrorCode {
 	INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST.value(), "P004", "이미지 파일만 업로드할 수 있습니다."),
 	FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "P005", "파일 크기는 512KB를 초과할 수 없습니다."),
 	TOTAL_FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "P006", "총 파일 크기는 3MB를 초과할 수 없습니다."),
-	PRODUCT_IN_USE(HttpStatus.CONFLICT.value(), "P007", "해당 상품은 주문 내역이 존재하여 삭제할 수 없습니다.");
+	PRODUCT_IN_USE(HttpStatus.CONFLICT.value(), "P007", "해당 상품은 주문 내역이 존재하여 삭제할 수 없습니다."),
+	IMAGE_NOT_PROVIDED(HttpStatus.BAD_REQUEST.value(), "P007", "상품 이미지는 필수입니다.");
 	private final int status;
 	private final String code;
 	private final String message;

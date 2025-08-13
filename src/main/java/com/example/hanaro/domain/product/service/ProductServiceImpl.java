@@ -62,7 +62,12 @@ public class ProductServiceImpl implements ProductService {
 			.stockQuantity(requestDto.getStockQuantity())
 			.build();
 
+
 		List<MultipartFile> images = requestDto.getImages();
+
+		if (images == null || images.isEmpty() || images.stream().allMatch(MultipartFile::isEmpty)) {
+			throw new ProductException(IMAGE_NOT_PROVIDED);
+		}
 
 		if (images != null && !images.isEmpty()) {
 			validateFiles(images);
@@ -202,6 +207,25 @@ public class ProductServiceImpl implements ProductService {
 		if (orderItemRepository.existsByProduct(product)) {
 			log.error(" >> 삭제 실패: 상품 '{}'에 대한 주문 내역이 존재합니다.", product.getName());
 			throw new ProductException(ProductErrorCode.PRODUCT_IN_USE);
+		}
+
+			List<ProductImage> images = product.getProductImages();
+		if (images != null && !images.isEmpty()) {
+			for (ProductImage image : images) {
+				try {
+					String relativePath = image.getImageUrl().substring(1);
+
+					Path filePath = Paths.get(uploadDir, relativePath);
+
+					if (Files.deleteIfExists(filePath)) {
+						log.info(" > 이미지 파일 삭제 성공: {}", filePath);
+					} else {
+						log.warn(" > 삭제할 이미지 파일이 존재하지 않음: {}", filePath);
+					}
+				} catch (IOException e) {
+					log.error(" > 이미지 파일 삭제 실패: {}", image.getImageUrl(), e);
+				}
+			}
 		}
 
 		productRepository.delete(product);

@@ -100,6 +100,19 @@ public class CartController {
 		return ResponseEntity.ok(new BaseResponse<>());
 	}
 
+	@Operation(summary = "장바구니 삭제", description = "장바구니를 제거합니다.")
+	@SecurityRequirement(name = "JWT Authentication")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
+		@ApiResponse(responseCode = "404", description = "존재하지 않는 장바구니", content = @Content(schema = @Schema(implementation = BaseErrorResponse.class)))
+	})
+	@DeleteMapping
+	public ResponseEntity<BaseResponse<Void>> deleteCart() {
+		Long userId = getUserIdFromAuthentication();
+		cartService.deleteCart(userId);
+		return ResponseEntity.ok(new BaseResponse<>());
+	}
+
 	private Long getUserIdFromAuthentication() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String userEmail = authentication.getName();

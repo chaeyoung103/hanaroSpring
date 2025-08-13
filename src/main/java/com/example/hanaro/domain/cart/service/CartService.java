@@ -33,4 +33,6 @@ public interface CartService {
 	 * @param cartItemId 삭제할 장바구니 상품의 ID
 	 */
 	void deleteCartItem(Long userId, Long cartItemId);
+
+	void deleteCart(Long userId);
 }

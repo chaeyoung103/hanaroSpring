@@ -17,9 +17,11 @@ public class OrderResponseDto {
 	private final String status;
 	private final int totalPrice;
 	private final List<OrderItemResponseDto> orderItems;
+	private final Long userId;
 
 	public static OrderResponseDto fromEntity(Order order) {
 		return OrderResponseDto.builder()
+			.userId(order.getUser().getId())
 			.orderId(order.getId())
 			.orderDate(order.getOrderDate())
 			.status(order.getStatus().getDescription())
